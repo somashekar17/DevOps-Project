@@ -1,5 +1,5 @@
 <div align="center">
- ![Devops_phase](https://github.com/somashekar17/DevSecOps-Project/assets/49157790/2931c780-27cb-4e04-90ca-b424a2edf7ec)
+<img src=".![Devops_phase](https://github.com/somashekar17/DevSecOps-Project/assets/49157790/2931c780-27cb-4e04-90ca-b424a2edf7ec)">
 
 
   <br>
