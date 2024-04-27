@@ -14,13 +14,7 @@
   <p align="center">Home Page</p>
 </div>
 
-# **Youtube Video for step by step Demonstration!**
-[![Video Tutorial](https://img.youtube.com/vi/g8X5AoqCJHc/0.jpg)](https://youtu.be/g8X5AoqCJHc)
 
-
-## Susbcribe:
-[https://www.youtube.com/@cloudchamp?
-](https://www.youtube.com/@cloudchamp?sub_confirmation=1)
 
 # Deploy Netflix Clone on Cloud using Jenkins - DevSecOps Project!
 
@@ -37,7 +31,7 @@
 - Clone your application's code repository onto the EC2 instance:
     
     ```bash
-    git clone https://github.com/N4si/DevSecOps-Project.git
+    git clone https://github.com/somashekar17/DevSecOps-Project.git
     ```
     
 
@@ -82,40 +76,6 @@ Now recreate the Docker image with your api key:
 docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
 ```
 
-**Phase 2: Security**
-
-1. **Install SonarQube and Trivy:**
-    - Install SonarQube and Trivy on the EC2 instance to scan for vulnerabilities.
-        
-        sonarqube
-        ```
-        docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
-        ```
-        
-        
-        To access: 
-        
-        publicIP:9000 (by default username & password is admin)
-        
-        To install Trivy:
-        ```
-        sudo apt-get install wget apt-transport-https gnupg lsb-release
-        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-        echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-        sudo apt-get update
-        sudo apt-get install trivy        
-        ```
-        
-        to scan image using trivy
-        ```
-        trivy image <imageid>
-        ```
-        
-        
-2. **Integrate SonarQube and Configure:**
-    - Integrate SonarQube with your CI/CD pipeline.
-    - Configure SonarQube to analyze code for quality and security issues.
-
 **Phase 3: CI/CD Setup**
 
 1. **Install Jenkins for Automation:**
@@ -154,11 +114,7 @@ Install below plugins
 
 1 Eclipse Temurin Installer (Install without restart)
 
-2 SonarQube Scanner (Install without restart)
-
-3 NodeJs Plugin (Install Without restart)
-
-4 Email Extension Plugin
+2 NodeJs Plugin (Install Without restart)
 
 ### **Configure Java and Nodejs in Global Tool Configuration**
 
@@ -191,11 +147,9 @@ pipeline {
     agent any
     tools {
         jdk 'jdk17'
-        nodejs 'node16'
+        nodejs 'node18'
     }
-    environment {
-        SCANNER_HOME = tool 'sonar-scanner'
-    }
+    
     stages {
         stage('clean workspace') {
             steps {
@@ -207,14 +161,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/N4si/DevSecOps-Project.git'
             }
         }
-        stage("Sonarqube Analysis") {
-            steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
-                    -Dsonar.projectKey=Netflix'''
-                }
-            }
-        }
+        
         stage("quality gate") {
             steps {
                 script {
@@ -283,9 +230,6 @@ pipeline{
         jdk 'jdk17'
         nodejs 'node16'
     }
-    environment {
-        SCANNER_HOME=tool 'sonar-scanner'
-    }
     stages {
         stage('clean workspace'){
             steps{
@@ -294,17 +238,10 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/N4si/DevSecOps-Project.git'
+                git branch: 'main', url: 'https://github.com/somashekar17/DevSecOps-Project.git'
             }
         }
-        stage("Sonarqube Analysis "){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
-                    -Dsonar.projectKey=Netflix '''
-                }
-            }
-        }
+        
         stage("quality gate"){
            steps {
                 script {
@@ -317,17 +254,7 @@ pipeline{
                 sh "npm install"
             }
         }
-        stage('OWASP FS SCAN') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-        stage('TRIVY FS SCAN') {
-            steps {
-                sh "trivy fs . > trivyfs.txt"
-            }
-        }
+
         stage("Docker Build & Push"){
             steps{
                 script{
@@ -339,14 +266,10 @@ pipeline{
                 }
             }
         }
-        stage("TRIVY"){
-            steps{
-                sh "trivy image nasi101/netflix:latest > trivyimage.txt" 
-            }
-        }
+        
         stage('Deploy to container'){
             steps{
-                sh 'docker run -d --name netflix -p 8081:80 nasi101/netflix:latest'
+                sh 'docker run -d --name netflix -p 8081:80 somashekarn17/netflix:latest'
             }
         }
     }
@@ -677,82 +600,7 @@ That's it! You've successfully installed and set up Grafana to work with Prometh
     - Integrate Jenkins with Prometheus to monitor the CI/CD pipeline.
 
 
-**Phase 5: Notification**
-
-1. **Implement Notification Services:**
-    - Set up email notifications in Jenkins or other notification mechanisms.
-
-# Phase 6: Kubernetes
-
-## Create Kubernetes Cluster with Nodegroups
-
-In this phase, you'll set up a Kubernetes cluster with node groups. This will provide a scalable environment to deploy and manage your applications.
-
-## Monitor Kubernetes with Prometheus
-
-Prometheus is a powerful monitoring and alerting toolkit, and you'll use it to monitor your Kubernetes cluster. Additionally, you'll install the node exporter using Helm to collect metrics from your cluster nodes.
-
-### Install Node Exporter using Helm
-
-To begin monitoring your Kubernetes cluster, you'll install the Prometheus Node Exporter. This component allows you to collect system-level metrics from your cluster nodes. Here are the steps to install the Node Exporter using Helm:
-
-1. Add the Prometheus Community Helm repository:
-
-    ```bash
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-    ```
-
-2. Create a Kubernetes namespace for the Node Exporter:
-
-    ```bash
-    kubectl create namespace prometheus-node-exporter
-    ```
-
-3. Install the Node Exporter using Helm:
-
-    ```bash
-    helm install prometheus-node-exporter prometheus-community/prometheus-node-exporter --namespace prometheus-node-exporter
-    ```
-
-Add a Job to Scrape Metrics on nodeip:9001/metrics in prometheus.yml:
-
-Update your Prometheus configuration (prometheus.yml) to add a new job for scraping metrics from nodeip:9001/metrics. You can do this by adding the following configuration to your prometheus.yml file:
-
-
-```
-  - job_name: 'Netflix'
-    metrics_path: '/metrics'
-    static_configs:
-      - targets: ['node1Ip:9100']
-```
-
-Replace 'your-job-name' with a descriptive name for your job. The static_configs section specifies the targets to scrape metrics from, and in this case, it's set to nodeip:9001.
-
-Don't forget to reload or restart Prometheus to apply these changes to your configuration.
-
-To deploy an application with ArgoCD, you can follow these steps, which I'll outline in Markdown format:
-
-### Deploy Application with ArgoCD
-
-1. **Install ArgoCD:**
-
-   You can install ArgoCD on your Kubernetes cluster by following the instructions provided in the [EKS Workshop](https://archive.eksworkshop.com/intermediate/290_argocd/install/) documentation.
-
-2. **Set Your GitHub Repository as a Source:**
-
-   After installing ArgoCD, you need to set up your GitHub repository as a source for your application deployment. This typically involves configuring the connection to your repository and defining the source for your ArgoCD application. The specific steps will depend on your setup and requirements.
-
-3. **Create an ArgoCD Application:**
-   - `name`: Set the name for your application.
-   - `destination`: Define the destination where your application should be deployed.
-   - `project`: Specify the project the application belongs to.
-   - `source`: Set the source of your application, including the GitHub repository URL, revision, and the path to the application within the repository.
-   - `syncPolicy`: Configure the sync policy, including automatic syncing, pruning, and self-healing.
-
-4. **Access your Application**
-   - To Access the app make sure port 30007 is open in your security group and then open a new tab paste your NodeIP:30007, your app should be running.
-
-**Phase 7: Cleanup**
+**Phase 5: Cleanup**
 
 1. **Cleanup AWS EC2 Instances:**
     - Terminate AWS EC2 instances that are no longer needed.
