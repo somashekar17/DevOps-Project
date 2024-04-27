@@ -119,7 +119,7 @@ Install below plugins
 
 ### **Configure Java and Nodejs in Global Tool Configuration**
 
-Goto Manage Jenkins → Tools → Install JDK(17) and NodeJs(16)→ Click on Apply and Save
+Goto Manage Jenkins → Tools → Install JDK(17) and NodeJs(18)→ Click on Apply and Save
 
 
 Create a Jenkins webhook
@@ -147,13 +147,6 @@ pipeline {
             }
         }
         
-        stage("quality gate") {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
-                }
-            }
-        }
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
