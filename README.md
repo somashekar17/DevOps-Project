@@ -16,7 +16,7 @@
 
 
 
-# Deploy Netflix Clone on Cloud using Jenkins - DevSecOps Project!
+# Deploy Netflix Clone on Cloud using Jenkins - DevOps Project!
 
 ### **Phase 1: Initial Setup and Deployment**
 
@@ -76,7 +76,7 @@ Now recreate the Docker image with your api key:
 docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
 ```
 
-**Phase 3: CI/CD Setup**
+**Phase 2: CI/CD Setup**
 
 1. **Install Jenkins for Automation:**
     - Install Jenkins on the EC2 instance to automate deployment:
@@ -120,22 +120,6 @@ Install below plugins
 
 Goto Manage Jenkins → Tools → Install JDK(17) and NodeJs(16)→ Click on Apply and Save
 
-
-### SonarQube
-
-Create the token
-
-Goto Jenkins Dashboard → Manage Jenkins → Credentials → Add Secret Text. It should look like this
-
-After adding sonar token
-
-Click on Apply and Save
-
-**The Configure System option** is used in Jenkins to configure different server
-
-**Global Tool Configuration** is used to configure different tools that we install using Plugins
-
-We will install a sonar scanner in the tools.
 
 Create a Jenkins webhook
 
@@ -285,7 +269,7 @@ sudo systemctl restart jenkins
 
 ```
 
-**Phase 4: Monitoring**
+**Phase 3: Monitoring**
 
 1. **Install Prometheus and Grafana:**
 
@@ -600,7 +584,7 @@ That's it! You've successfully installed and set up Grafana to work with Prometh
     - Integrate Jenkins with Prometheus to monitor the CI/CD pipeline.
 
 
-**Phase 5: Cleanup**
+**Phase 4: Cleanup**
 
 1. **Cleanup AWS EC2 Instances:**
     - Terminate AWS EC2 instances that are no longer needed.
